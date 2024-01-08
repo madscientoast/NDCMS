@@ -31,11 +31,18 @@ for e in range(events.GetEntries()):
                         #Only 1 pair of same GenPart PT in a event at a time?
                         print("GEN: ", gpt[i],geta[i],gphi[i]) #Inspecting PT, ETA, and PHI for GenPart and RECO photons. 
                         print("GEN: ", gpt[j],geta[j],gphi[j])
+                        GenPart0 = TLorentzVector()
+                        GenPart1 = TLorentzVector()
+                        GenPart0.SetPtEtaPhiM(gpt[i],geta[i],gphi[i],gm[i])
+                        GenPart1.SetPtEtaPhiM(gpt[j],geta[j],gphi[j],gm[j])
                         for k in range(len(pt)):
-                            #print("RECO: ",pt[k],eta[k],phi[k])
-                            if abs(geta[i]-eta[k]) < 0.2 or abs(geta[j]-eta[k]) < 0.2: #ROUGH but will refine
-                                if abs(gphi[i]-phi[k]) < 0.2 or abs(gphi[j]-phi[k]) < 0.2:
-                                    print("RECO: ",pt[k],eta[k],phi[k])                 #seems to work for matching GenPart to RECO, will ask later
+                            photon0 = TLorentzVector()
+                            photon0.SetPtEtaPhiM(pt[k],eta[k],phi[k],m[k])
+                            dR1 = GenPart0.DeltaR(photon0) 
+                            dR2 = GenPart1.DeltaR(photon0)
+                            #print("RECO: ",pt[k],eta[k],phi[k],dR1,dR2)
+                            if dR1 < 0.7 and dR2 < 0.7: #Still need to fine tune a bit
+                                print("RECO: ",pt[k],eta[k],phi[k],dR1,dR2) #This matches GenPart to RECO I think? I'll ask later. 
                             
     
 
