@@ -26,8 +26,8 @@ for e in range(events.GetEntries()):
                 for j in range(len(pid)):
                     if j >= i:
                         continue
-                    if gpt[j] == gpt[i] and mom[i] == mom[j]:
-                        print("PT matched: Event, PT, P1, P2, momID1, momID2 ",e, gpt[j],i,j,mom[i], mom[j],pid[mom[j]]) 
+                    if mom[i] == mom[j]:
+                        print("Matched mother: Event, PT, P1, P2, momID1, momID2 ",e, gpt[j],i,j,mom[i], mom[j],pid[mom[j]]) 
                         #Only 1 pair of same GenPart PT in a event at a time?
                         print("GEN: ", gpt[i],geta[i],gphi[i]) #Inspecting PT, ETA, and PHI for GenPart and RECO photons. 
                         print("GEN: ", gpt[j],geta[j],gphi[j])
