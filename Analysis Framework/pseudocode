@@ -1,0 +1,28 @@
+START PROGRAM
+LOAD ALL LIBRARIES
+
+LOAD DATA
+LOAD EVENTS
+
+CREATE CANVAS (To Paint On)
+CREATE EMPTY HISTOGRAM 
+FILL HISTOGRAM #Only line that matters is Filling. All physics happens here. 
+FORMAT HISTOGRAM
+DRAW HISTOGRAM TO CANVAS 
+SAVE FILE 
+
+END PROGRAM
+============================================================================
+START                                                                       #Lines 16-22 are good
+for event in File:
+    Get # of particles 
+    Get trigger info
+    if 4 particles and passes trigger:
+        Get info for each photon (pt, eta, phi, mvaID)
+        Store photon 4-vectors
+        Apply necessary cuts                                                #Just need to apply Vetos, otherwise good
+        Find all combinations of pairs of pairs (1234, 1324, 1423)          #Literally just combinations, cannot be wrong 
+        Apply combinations to make diphoton objects                         #Just applied line 24 to 22 -> looks good
+        Choose and apply pairing method (dR, MA)                            #Only lines that could give issue are 24-26 -> looks good
+        Fill Histogram with variable of choice                              #No physics just filling what we did
+END

@@ -6,7 +6,7 @@ gs.SetOptFit(1)
 
 def FindAndSetMax(h): #Marc's code
 	maximum = 0.0
-	#h.SetStats(0)
+	h.SetStats(0)
 	t = h.GetMaximum()
 	if t > maximum:
 		maximum = t
@@ -15,16 +15,16 @@ def FindAndSetMax(h): #Marc's code
 	return maximum*1.35
 
 def FitCB(h,stdev,alpha):
-	cfit = TF1("cfit","crystalball",40.0,90.0)
+	cfit = TF1("cfit","crystalball",50.0,100.0)
 	cfit.SetParameter(2,stdev)
-	#cfit.SetParameter(3,alpha)
+	cfit.SetParameter(3,alpha)
 	h.Fit(cfit,"EMR0")
 	#cfit.Draw("SAME")
 	#cfit.SetLineColor(2)
 	return cfit
 
 def PullPlot(h,cb):
-	sh = TH1D("sh", "", 100, 40.0, 90)
+	sh = TH1D("sh", "", 100, 50.0, 100.0)
 	h2 = cb.GetHistogram() #Crystal Ball Fit
 	for i in range(h.GetNcells()):
 		sh.SetBinContent(i,(h.GetBinError(i)))
