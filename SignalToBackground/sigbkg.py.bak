@@ -1,0 +1,89 @@
+from ROOT import *
+from itertools import combinations
+from math import floor,sqrt
+from fmt import *
+from kinematics import *
+from pairing import *
+from numpy import arange
+
+canv = TCanvas()
+#Open Files
+signal = TFile.Open("X300A15/result.root") #MC
+bkg = TFile.Open("/project01/ndcms/atownse2/RSTriPhoton/data/NanoAODv9/EGamma_Run2018D-UL2018_MiniAODv2_NanoAODv9-v3_1.root") #Data File
+sigEvents = signal.Events
+bkgEvents = bkg.Events
+#Create Hists
+h1 = TH1D("h1", "Average Mass [MC]", 100, 0.0, 200.0)
+h2 = TH1D("h2", "Average Mass [Data]", 100, 0.0, 200.0)
+h3 = TH1D("h3", "Sig to Bkg", 100, 0.0, 200.0)
+#Select Region
+low = 10.0
+high = 20.0
+selection = arange(low,high,0.1)
+
+def MVAcut(id,v,lst): #90% cut at present
+    result = []
+    for i in range(len(lst)):
+        if v[i] == 1: #Apply electron veto
+            if lst[i][1] > 1.4: #Check eta to see if in endcap
+                if id[i] > 0.14: #apply endcap cut
+                    continue
+                else:
+                    result.append(lst[i])
+            else: #in barrel
+                if id[i] > 0.27: #apply barrel cut
+                    continue
+                else:
+                    result.append(lst[i])
+        else:
+            continue
+    return result
+
+def hfiller(events,h):
+    for e in range(0,events.GetEntries()): 
+        events.GetEntry(e)
+        nPhoton = events.nPhoton
+        trigger = events.HLT_TriplePhoton_35_35_5_CaloIdLV2_R9IdVL
+        if nPhoton == 4 and trigger == 1:
+            pt = events.Photon_pt
+            eta = events.Photon_eta
+            phi = events.Photon_phi 
+            m = events.Photon_mass
+            mva = events.Photon_mvaID
+            veto = events.Photon_electronVeto
+            vec = [[pt[i],eta[i],phi[i],0] for i in range(4)]
+            vec = MVAcut(mva,veto,vec) #Apply MVA cut
+            if len(vec) < 4:
+                continue
+            pair = MakePairs(vec)
+            index = ChoosePair("dR",pair)
+            photon0,photon1,photon2,photon3 = CreatePhotons(pair,index)
+            phi0 = photon0+photon1
+            phi1 = photon2+photon3
+            PhiMasses = [phi0.M(),phi1.M()]
+            avgPhi = (PhiMasses[0]+PhiMasses[1])/2
+            h.Fill(avgPhi)
+    return
+
+hfiller(sigEvents,h1)
+hfiller(bkgEvents,h2)
+
+#Drawing Time
+x = h1.GetXaxis()
+y = h1.GetYaxis()
+x.SetTitle("Average Mass (MC vs Data) [GeV]")
+y.SetTitle("Events")
+FindAndSetMax(h1)
+#h1.Draw("E")
+#h2.Draw("E SAME")
+
+#Take sqrt of b#
+for i in range(100):
+    if (h1.GetBinContent(i)+h2.GetBinContent(i)) == 0:
+        h3.SetBinContent(i,0)
+    else:
+        h3.SetBinContent(i,((h1.GetBinContent(i))/(sqrt(h1.GetBinContent(i)+h2.GetBinContent(i)))))
+h3.Draw("E")
+canv.SaveAs("SignalToBkgTest2.root")
+
+        
