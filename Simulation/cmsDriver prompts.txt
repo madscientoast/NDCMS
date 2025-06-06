@@ -1,0 +1,63 @@
+#cmsDriver prompts for each stage#
+
+# LHEGS/GEN-SIM #
+
+cmsDriver.py Configuration/Generator/python/my_fragment.py \
+ --eventcontent RAWSIM,LHE \
+ --customise Configuration/DataProcessing/Utils.addMonitoring \
+ --datatier GEN-SIM,LHE --conditions 93X_mc2017_realistic_v3 \
+ --beamspot Realistic25ns13TeVEarly2017Collision \
+ --customise_commands process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" \
+ --step LHE,GEN,SIM \
+ --geometry DB:Extended \
+ --era Run2_2017 \
+ --python_filename NPS-X300A20wmLHEGS_1_cfg.py \
+ --fileout file:NPS-X300A20wmLHEGS_1.root \
+ --number 10 \
+ --no_exec --mc
+
+ # Premix + PU
+   cmsDriver.py  --eventcontent PREMIXRAW \
+  --customise Configuration/DataProcessing/Utils.addMonitoring \
+  --datatier GEN-SIM-RAW \
+  --conditions auto:phase1_2017_realistic \
+  --step DIGI,DATAMIX,L1,DIGI2RAW,HLT:@relval2017 \
+  --datamix PreMix \
+  --era Run2_2017 \
+  --python_filename NPS-RunIIFall17DRPremix_1_cfg.py \
+  --fileout file:NPS-X300A20_Premix_1.root \
+  --filein file:NPS-X300A20wmLHEGS_1.root \
+  --number 10 \
+  --pileup_input "dbs:/Neutrino_E-10_gun/RunIISummer17PrePremix-MCv2_correctPU_94X_mc2017_realistic_v9-v1/GEN-SIM-DIGI-RAW" \
+  --no_exec --mc
+
+# Premix No PU
+  cmsDriver.py \
+  --eventcontent RAWSIM \
+  --customise Configuration/DataProcessing/Utils.addMonitoring \
+  --datatier GEN-SIM-RAW \
+  --conditions auto:phase1_2017_realistic \
+  --step DIGI,L1,DIGI2RAW \
+  --era Run2_2017 \
+  --python_filename NPS-RunIIFall17DR_NoPileup_cfg.py \
+  --fileout file:NPS-X300A20_NoPileup.root \
+  --filein file:NPS-X300A20wmLHEGS_1.root \
+  --number 10 \
+  --no_exec --mc
+
+#AODSIM
+cmsDriver.py step2 \
+  --filein file:NPS-X300A20_NoPileup.root \
+  --fileout file:NPS-X300A20_AODSIM.root \
+  --conditions auto:phase1_2017_realistic \
+  --step RAW2DIGI,L1Reco,RECO,RECOSIM,EI \
+  --datatier AODSIM \
+  --eventcontent AODSIM \
+  --era Run2_2017 \
+  --runUnscheduled \
+  --mc \
+  --no_exec \
+  --number -1 \
+  --python_filename X300A20_AODSIM_cfg.py
+
+
