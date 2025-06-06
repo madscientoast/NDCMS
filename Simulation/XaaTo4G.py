@@ -1,0 +1,56 @@
+# This is my LHEGS code fragment #
+import FWCore.ParameterSet.Config as cms
+
+externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
+    args = cms.vstring('/scratch365/rsnuggs/genproductions/bin/MadGraph5_aMCatNLO/XaaTo4G_X300A20_el9_amd64_gcc11_CMSSW_13_2_9_tarball.tar.xz'),
+    nEvents = cms.untracked.uint32(10),
+    numberOfParameters = cms.uint32(1),
+    outputFile = cms.string('cmsgrid_final.lhe'),
+    scriptName = cms.FileInPath('GeneratorInterface/LHEInterface/data/run_generic_tarball_cvmfs.sh')
+)
+
+# Link to cards:
+# https://github.com/cms-sw/genproductions/tree/mg26x/bin/MadGraph5_aMCatNLO/cards/production/2017/13TeV/XtoAAto4G
+
+import FWCore.ParameterSet.Config as cms
+
+from Configuration.Generator.Pythia8CommonSettings_cfi import *
+from Configuration.Generator.MCTunes2017.PythiaCP5Settings_cfi import *
+from Configuration.Generator.PSweightsPythia.PythiaPSweightsSettings_cfi import *
+
+generator = cms.EDFilter("Pythia8HadronizerFilter",
+    maxEventsToPrint = cms.untracked.int32(1),
+    pythiaPylistVerbosity = cms.untracked.int32(1),
+    filterEfficiency = cms.untracked.double(1.0),
+    pythiaHepMCVerbosity = cms.untracked.bool(False),
+    comEnergy = cms.double(13000.),
+    PythiaParameters = cms.PSet(
+        pythia8CommonSettingsBlock,
+        pythia8CP5SettingsBlock,
+        pythia8PSweightsSettingsBlock,
+        processParameters = cms.vstring(
+            'JetMatching:setMad = off',
+            'JetMatching:scheme = 1',
+            'JetMatching:merge = on',
+            'JetMatching:jetAlgorithm = 2',
+            'JetMatching:etaJetMax = 5.',
+            'JetMatching:coneRadius = 1.',
+            'JetMatching:slowJetPower = 1',
+            'JetMatching:qCut = 150.', #this is the actual merging scale
+            'JetMatching:doFxFx = off',
+            'JetMatching:nQmatch = 5', #5 for 5-flavour scheme (matching of b-quarks)
+            'JetMatching:nJetMax = 1', #number of partons in born matrix element for highest multiplicity
+            'JetMatching:doShowerKt = off', #off for MLM matching, turn on for shower-kT matching
+        ),
+        parameterSets = cms.vstring('pythia8CommonSettings',
+                                    'pythia8CP5Settings',
+                                    'pythia8PSweightsSettings',
+                                    'processParameters',
+                                    )
+
+    )
+)
+
+
+# Link to generator fragment:
+# /afs/cern.ch/work/s/shjeon/private/GenContact/Automatic-McM-EXO/pythia_fragments/Hadronizer_xaa4gamma_TuneCP5_13TeV_MLM_5f_max1j_qCut150_xqCut100_LHE_pythia8_cff.py
