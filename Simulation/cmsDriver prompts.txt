@@ -1,7 +1,7 @@
 #cmsDriver prompts for each stage#
 
 # LHEGS/GEN-SIM #
-
+SEED=$(($(date +%s) % 100 + 1))
 cmsDriver.py Configuration/Generator/python/my_fragment.py \
  --eventcontent RAWSIM,LHE \
  --customise Configuration/DataProcessing/Utils.addMonitoring \
