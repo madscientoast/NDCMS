@@ -741,7 +741,7 @@ if [ -n "$6" ]; then
     cmssw_version=${6}
 else
     if [[ $SYSTEM_RELEASE == *"release 7"* ]]; then 
-        cmssw_version=CMSSW_12_4_8
+        cmssw_version=CMSSW_12_2_3
     elif [[ $SYSTEM_RELEASE == *"release 8"* ]]; then
         cmssw_version=CMSSW_12_4_8
     elif [[ $SYSTEM_RELEASE == *"release 9"* ]]; then
