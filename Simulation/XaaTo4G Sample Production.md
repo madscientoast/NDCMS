@@ -287,7 +287,7 @@ You want to copy your cards to the genproductions directory as it doesn’t do w
 ```csh
 cp -r /path/to/XaaTEST/Cards/ /path/to/genproductions/bin/MadGraph5_aMCatNLO/
 cd /path/to/genproductions/bin/MadGraph5_aMCatNLO
-./gridpack_generation.sh OUTPUT_NAME CARDS_DIR/ local |
+./gridpack_generation.sh OUTPUT_NAME CARDS_DIR/ local
 ```
 
 Now that you have a gridpack, it can be used to do the GEN-SIM step in simulation. **Good here.**
