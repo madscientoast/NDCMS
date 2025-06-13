@@ -164,7 +164,7 @@ Stephen says continue as:
   \! (turn off for VBF and single top processes)  
   30.0   \= xqcut   \! minimum kt jet measure between partons
 
- becomes:
+  becomes:
 
   1	\= ickkw \! 0 no matching, 1 MLM  
   1     \= highestmult \! for ickkw=2, highest mult group  
