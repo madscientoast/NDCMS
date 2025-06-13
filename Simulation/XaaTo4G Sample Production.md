@@ -19,13 +19,15 @@ This guide assumes that you have all necessary accounts required for signal gene
 
 General Way:
 
-|setenv VO_CMS_SW_DIR /cvmfs/cms.cern.ch
+| '''csh
+setenv VO_CMS_SW_DIR /cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.csh
 setenv SCRAM_ARCH slc6_amd64_gcc630
 cmsrel CMSSW_10_1_0
 cd CMSSW_10_1_0
 cd src
-cmsenv|
+cmsenv
+''' |
 
 What’s need at time of writing this document on NDCRC:
 
