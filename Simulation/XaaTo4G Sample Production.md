@@ -28,44 +28,75 @@ This guide assumes that you have all necessary accounts required for signal gene
   cd src cmsenv 
   ``` 
 
-What’s need at time of writing this document on NDCRC:
-
-| cmssw-el7 	\#Need a container in /users/name, otherwise you would need to use scratch export SCRAM\_ARCH=slc7\_amd64\_gcc10cmsrel CMSSW\_12\_2\_3 	\#or need CMSSW\_12\_2\_X or earlier for HLTcd CMSSW\_12\_2\_3/src/cmsenv |
-| :---- |
+**What’s need at time of writing this document on NDCRC:**
+```csh
+cmssw-el7 	#Need a container in /users/uname, otherwise you would need to use scratch
+export SCRAM_ARCH=slc7_amd64_gcc10 	#or need CMSSW_12_2_X or earlier for HLT
+cmsrel CMSSW_12_2_3 #or need CMSSW_12_2_X or earlier for HLT
+cd CMSSW_12_2_3/src/
+cmsenv
+```
 
 After we get a CMSSW environment we will want to check out some additional tools/scripts. Namely, we want all the python files necessary for our cmsDriver/cmsRun commands. We also want genproductions for the scripts necessary to make gridpacks.
 
-For these we run:
-
-| git cms-addpkg Configurationgit cms-addpkg HLTrigger/Configurationgit clone https://github.com/cms-sw/genproductions.git genproductions |
-| :---- |
+**For these we run:**
+```csh
+git cms-init
+git cms-addpkg Configuration
+git cms-addpkg HLTrigger/Configuration
+git clone https://github.com/cms-sw/genproductions.git genproductions
+```
 
 Next, is the MadGraph specific setup. This is specified based on the model we are using, so one follows much from Stephen’s instructions here. 
 
 Download and Install Madgraph. Stephen originally used MG v2.6.2, we will be using the most recent build at the time I started writing this guide. ([https://launchpad.net/mg5amcnlo/3.0/3.6.x/+download/MG5\_aMC\_v3.6.2.tar.gz](https://launchpad.net/mg5amcnlo/3.0/3.6.x/+download/MG5_aMC_v3.6.2.tar.gz))  
 (If the link is broken just visit launchpad to find the build.)
 
-Proceed as follows:
-
-| tar \-zxvf MG5\_aMC\_v3.6.2.tar.gz   \# can use curl or ssh upload to get MG on clustercd MG5\_aMC\_v3\_6\_2		         \#go into MG directorymkdir HEPTools |
-| :---- |
+**Proceed as follows:**
+```csh
+tar -zxvf MG5_aMC_v3.6.2.tar.gz   # can use curl or ssh upload to get MG on cluster
+cd MG5_aMC_v3_6_2		         #go into MG directory
+mkdir HEPTools 
+```
 
 Download LHAPDF and manually install it (DO NOT USE “install” INSIDE MG5). Stephen used LHAPDF v6.2.1, we will be using the newest version (v6.5.5) The link will follow below: [https://lhapdf.hepforge.org/downloads/?f=LHAPDF-6.5.5.tar.gz](https://lhapdf.hepforge.org/downloads/?f=LHAPDF-6.5.5.tar.gz)  
-Then, install as follows:
+**Then, install as follows**
+```csh
+#(somewhere outside MG directory)
+./configure --prefix=/path/to/MG5_aMC_v3_6_2/HEPTools/lhapdf6
+make
+make install
+```
+Then change: 
+MG5_aMC_v2_6_2/input/mg5_configuration.txt:
+# lhapdf \= lhapdf-config (default, change this to next line:)
+lhapdf = /path/to/MG5_aMC_v3_6_2/HEPTools/lhapdf6/bin/lhapdf-config #(change it to this!) 
 
-| \#(somewhere outside MG directory) ./configure *\--prefix=/path/to/MG5\_aMC\_v3\_6\_2/HEPTools/lhapdf6*makemake installThen change:MG5\_aMC\_v2\_6\_2/input/mg5\_configuration.txt:	\# lhapdf \= lhapdf-config (default, change this to next line:)	lhapdf \= /path/to/MG5\_aMC\_v3\_6\_2/HEPTools/lhapdf6/bin/lhapdf-config \#(change it to this\!) |
-| :---- |
 
 Similarly to LHAPDF, Download (v 3.3.1) and Install FastJet. Stephen used v3.3.1. At the time of starting this guide I used v3.4.3 but you can get whatever version here: [https://fastjet.fr/](https://fastjet.fr/)  
-Follow as proceeds
-
-| \#(somewhere outside MG directory) tar \-zxvf fastjet-3.4.3.tar.gzcd fastjet-3.4.3./configure \--prefix= /path/to/MG5\_aMC\_v3\_6\_2/HEPTools/fastjet/makemake checkmake installThen change:MG5\_aMC\_v2\_6\_2/input/mg5\_configuration.txt:	\# fastjet \= fastjet-config (default, change this to next line:)	fastjet \=  /path/to/MG5\_aMC\_v3\_6\_2/ (change it to this\!) |
-| :---- |
+**Follow as proceeds**
+```csh
+#(somewhere outside MG directory)
+tar -zxvf fastjet-3.4.3.tar.gz
+cd fastjet-3.4.3
+./configure --prefix= /path/to/MG5_aMC_v3_6_2/HEPTools/fastjet/
+make
+make check
+make install
+```
+Then change:
+MG5_aMC_v2_6_2/input/mg5_configuration.txt:	
+# fastjet = fastjet-config (default, change this to next line:)	
+fastjet =  /path/to/MG5_aMC_v3_6_2/HEPTools/fastjet (change it to this!)
 
 Then we can install the last couple MG tools within MG as Stephen did in his guide
-
-| \#Install pythia8, Ninja\#(cd in MG directory)./bin/mg5\_AMCinstall pythia8install ninja |
-| :---- |
+```csh
+#Install pythia8, Ninja
+#(cd in MG directory)
+./bin/mg5_AMC
+install pythia8
+install ninja
+```
 
 Provided you have received the proper model files you can proceed with signal generation. This guide assumes you are using some variant of the Phi2\_simp\_tt model. Stephen’s guide referred to Phi2\_simp\_tt, but I am using *Phi2\_simp\_tt\_qed*. Phi2\_simp\_tt\_qed2 is an alternative that also exists according to CMSSW. 
 
