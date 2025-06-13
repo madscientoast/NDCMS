@@ -84,10 +84,10 @@ make
 make check
 make install
 ```
-Then change:
-MG5_aMC_v2_6_2/input/mg5_configuration.txt\:	
-\# fastjet = fastjet-config (default, change this to next line:)	
-fastjet =  /path/to/MG5_aMC_v3_6_2/HEPTools/fastjet (change it to this!)
+Then change:  
+MG5_aMC_v2_6_2/input/mg5_configuration.txt\:  	
+\# fastjet = fastjet-config (default, change this to next line:)  	
+fastjet =  /path/to/MG5_aMC_v3_6_2/HEPTools/fastjet (change it to this!)  
 
 Then we can install the last couple MG tools within MG as Stephen did in his guide
 ```csh
