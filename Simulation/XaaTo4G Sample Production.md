@@ -2,7 +2,7 @@
 
 This guide exists to document the process of signal generation for XaaTo4G analyses. It is loosely based on the old guide produced by Stephen. 
 
-![][image1]
+![][[image1](https://opendata.cern.ch/static/docs/cms-mc-production-overview/diagram.png)]
 
 Signal generation is the combination of the steps described above. The intention of this document is to walk you through how to do each step. 
 
