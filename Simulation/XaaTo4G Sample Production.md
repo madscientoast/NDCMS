@@ -272,8 +272,8 @@ We will also have to make a slight edit to the CMSSW version that is packaged wi
 Seek out the section that defines CMSSW\_VERSION.
 
 ```python
-if \[\[ $SYSTEM\_RELEASE \== \*"release 7"\* \]\]; then
-    cmssw\_version=CMSSW\_12\_4\_8
+if [[ $SYSTEM_RELEASE == *"release 7"* ]]; then
+    cmssw_version=CMSSW_12_4_8
 ```
 
 Change the second line to the following.
@@ -282,10 +282,13 @@ Change the second line to the following.
 
 You may also want to copy the line that copies MG to the gridpack after the cleanup again to ensure that it isn’t missing necessary files. 
 
-You want to copy your cards to the genproductions directory as it doesn’t do well in pointing outside of it. Then just do the following. 
-
-| cp \-r /path/to/XaaTEST/Cards/ /path/to/genproductions/bin/MadGraph5\_aMCatNLO/cd /path/to/genproductions/bin/MadGraph5\_aMCatNLO./gridpack\_generation.sh OUTPUT\_NAME CARDS\_DIR/ local |
-| :---- |
+You want to copy your cards to the genproductions directory as it doesn’t do well in pointing outside of it. 
+**Then just do the following.** 
+```csh
+cp -r /path/to/XaaTEST/Cards/ /path/to/genproductions/bin/MadGraph5_aMCatNLO/
+cd /path/to/genproductions/bin/MadGraph5_aMCatNLO
+./gridpack_generation.sh OUTPUT_NAME CARDS_DIR/ local |
+```
 
 Now that you have a gridpack, it can be used to do the GEN-SIM step in simulation. **Good here.**
 
