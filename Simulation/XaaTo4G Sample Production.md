@@ -380,34 +380,78 @@ Add/replace with,
 
 ## Before we Premix we need to generate a min bias PU file. These steps are based on Garvita’s instructions. 
 
-## We’ll start by generating a min bias file. 
+**We’ll start by generating a min bias file.** 
+```csh
+cmsDriver.py Configuration/Generator/python/MinBias_13TeV_pythia8_TuneCUETP8M1_cfi.py \
+ -s GEN,SIM -n 10 --conditions auto:phase1_2018_realistic --beamspot Realistic25ns13TeVEarly2018Collision \
+ --datatier GEN-SIM --eventcontent FEVTDEBUG --era Run2_2018 --relval 9000,100 \
+ --python_filename MinBiasSampleFull3.py --fileout file:MinBiasFull3.root --no_exec
+```
 
-| cmsDriver.py Configuration/Generator/python/MinBias\_13TeV\_pythia8\_TuneCUETP8M1\_cfi.py \\\-s GEN,SIM \-n 10 \--conditions auto:phase1\_2018\_realistic \--beamspot Realistic25ns13TeVEarly2018Collision \\\--datatier GEN-SIM \--eventcontent FEVTDEBUG \--era Run2\_2018 \--relval 9000,100 \\\--python\_filename MinBiasSampleFull3.py \--fileout file:MinBiasFull3.root \--no\_exec |
-| :---- |
-
-## After running that and getting its output, we then make the Premix sample. 
-
-| cmsDriver.py step1 \--evt\_type Configuration/Generator/python/SingleNuE10\_cfi.py \\\-s GEN,SIM,DIGI:pdigi\_valid \-n 10 \--conditions auto:phase1\_2018\_realistic \\\--datatier PREMIX \--eventcontent PREMIX \--procModifiers premix\_stage1 \\\--era Run2\_2018 \--relval 100000,100 \\\--pileup AVE\_35\_BX\_25ns \--pileup\_input file:MinBiasFull3.root \\\--python\_filename MinBiasFullstep21.py \--fileout file:MinBiasPremix\_RunII2018.root \--no\_exec |
-| :---- |
+**After running that and getting its output, we then make the Premix sample.** 
+```csh
+ cmsDriver.py step1 --evt_type Configuration/Generator/python/SingleNuE10_cfi.py \
+ -s GEN,SIM,DIGI:pdigi_valid -n 10 --conditions auto:phase1_2018_realistic \
+ --datatier PREMIX --eventcontent PREMIX --procModifiers premix_stage1 \
+ --era Run2_2018 --relval 100000,100 \
+ --pileup AVE_35_BX_25ns --pileup_input file:MinBiasFull3_RunII2017.root \
+ --python_filename MinBiasFullstep21_RunII2017.py --fileout file:MinBiasPremix_RunII2017.root --no_exec
+```
 
 # 5\. Premixing
 
-## Now that we have our GEN-SIM step done, we have to do the Premix step. This will start with following the old simulation. Originally, Stephen’s old config went roughly as follows. 
-
-|    cmsDriver.py  \--eventcontent PREMIXRAW \\  \--customise Configuration/DataProcessing/Utils.addMonitoring \\  \--datatier GEN-SIM-RAW \\  \--conditions auto:phase1\_2017\_realistic \\  \--step DIGI,DATAMIX,L1,DIGI2RAW,HLT:@relval2017 \\  \--datamix PreMix \\  \--era Run2\_2017 \\  \--python\_filename NPS-RunIIFall17DRPremix\_1\_cfg.py \\  \--fileout file:NPS-X300A20\_Premix\_1.root \\  \--filein file:NPS-X300A20wmLHEGS\_1.root \\  \--number 10 \\  \--pileup\_input "dbs:/Neutrino\_E-10\_gun/RunIISummer17PrePremix-MCv2\_correctPU\_94X\_mc2017\_realistic\_v9-v1/GEN-SIM-DIGI-RAW" \\  \--no\_exec \--mc |
-| :---- |
+## Now that we have our GEN-SIM step done, we have to do the Premix step. This will start with following the old simulation. 
+**Originally, Stephen’s old config went roughly as follows.** 
+```csh
+cmsDriver.py  --eventcontent PREMIXRAW \
+--customise Configuration/DataProcessing/Utils.addMonitoring \
+--datatier GEN-SIM-RAW \
+--conditions auto:phase1_2017_realistic \
+--step DIGI,DATAMIX,L1,DIGI2RAW,HLT:@relval2017 \
+--datamix PreMix \
+\--era Run2_2017 \
+--python_filename NPS-RunIIFall17DRPremix_1_cfg.py \
+--fileout file:NPS-X300A20_Premix_1.root --filein file:NPS-X300A20wmLHEGS_1.root \
+--number 10 \
+--pileup_input "dbs:/Neutrino_E-10_gun/RunIISummer17PrePremix-MCv2_correctPU_94X_mc2017_realistic_v9-v1/GEN-SIM-DIGI-RAW" \
+--no_exec --mc
+```
 
 ## 
 
-## This almost works, but we generated new PU so we have the following.
+**This almost works, but we generated new PU so we have the following.**
+```csh
+cmsDriver.py  --eventcontent PREMIXRAW \
+  --customise Configuration/DataProcessing/Utils.addMonitoring \
+  --datatier GEN-SIM-RAW \
+  --conditions auto:phase1_2018_realistic \
+  --step DIGI,DATAMIX,L1,DIGI2RAW,HLT \
+  --datamix PreMix \
+  --era Run2_2018 \
+  --procModifiers premix_stage2 \
+  --python_filename NPS-RunIIFall17DRPremix_1_cfg.py \
+  --fileout file:NPS-X300A20_Premix_1.root \
+  --filein file:NPS-X300A20wmLHEGS_1.root \
+  --number 10 \
+  --pileup_input file:MinBiasPremix_RunII2018.root \
+  --no_exec --mc
+```
 
-|  cmsDriver.py  \--eventcontent PREMIXRAW \\  \--customise Configuration/DataProcessing/Utils.addMonitoring \\  \--datatier GEN-SIM-RAW \\  \--conditions auto:phase1\_2018\_realistic \\  \--step DIGI,DATAMIX,L1,DIGI2RAW,HLT \\  \--datamix PreMix \\  \--era Run2\_2018 \\  \--procModifiers premix\_stage2 \\  \--python\_filename NPS-RunIIFall17DRPremix\_1\_cfg.py \\  \--fileout file:NPS-X300A20\_Premix\_1.root \\  \--filein file:NPS-X300A20wmLHEGS\_1.root \\  \--number 10 \\  \--pileup\_input file:MinBiasPremix\_RunII2018.root \\  \--no\_exec \--mc |
-| :---- |
-
-## After we have proper output from Premix \+ PU, we can then run AODSIM. 
-
-| cmsDriver.py step2 \\  \--filein file:NPS-X300A20\_Premix\_1.root \\  \--fileout file:NPS-X300A20\_AODSIM\_1.root \\  \--conditions auto:phase1\_2018\_realistic \\  \--step RAW2DIGI,L1Reco,RECO,RECOSIM \\  \--datatier AODSIM \\  \--eventcontent AODSIM \\  \--era Run2\_2018 \\  \--mc \\  \--no\_exec \\  \--number \-1 \\  \--python\_filename X300A20\_AODSIM\_cfg.py |
-| :---- |
+**After we have proper output from Premix \+ PU, we can then run AODSIM. **
+```csh
+cmsDriver.py step2 \
+  --filein file:NPS-X300A20_Premix_1.root \
+  --fileout file:NPS-X300A20_AODSIM_1.root \
+  --conditions auto:phase1_2018_realistic \
+  --step RAW2DIGI,L1Reco,RECO,RECOSIM \
+  --datatier AODSIM \
+  --eventcontent AODSIM \
+  --era Run2_2018 \
+  --mc \
+  --no_exec \
+  --number -1 \
+  --python_filename X300A20_AODSIM_cfg_1.py
+```
 
 ## After this we have effectively performed the DIGI-RECO step.
 
