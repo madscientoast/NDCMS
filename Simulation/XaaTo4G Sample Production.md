@@ -17,7 +17,7 @@ This guide assumes that you have all necessary accounts required for signal gene
 
 ## You’ll need a CMSSW environment first
 
-<pre> 
+
   **General Way:** 
   ```csh 
   setenv VO_CMS_SW_DIR /cvmfs/cms.cern.ch 
@@ -26,7 +26,7 @@ This guide assumes that you have all necessary accounts required for signal gene
   cmsrel CMSSW_10_1_0 
   cd CMSSW_10_1_0 
   cd src cmsenv 
-  ``` </pre>
+  ``` 
 
 What’s need at time of writing this document on NDCRC:
 
