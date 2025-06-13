@@ -108,20 +108,34 @@ module load python/3.12.8
 
 Here we will proceed with MadGraph card and LHE file generation guided by Stephen’s old instructions. The output here will then be tuned to be acceptable by the gridpack generation script(s) from genproductions. 
 
-### Begin by starting MG5 and loading our model
+**Begin by starting MG5 and loading our model**
+```csh
+cd /path/to/MG5_aMC_v3.6.2
+./bin/mg5_aMC
+import model Phi2_simp_tt_qed
+generate p p > y0 [QCD] QED = 0 @0 
+```
 
-| cd /path/to/MG5\_aMC\_v3.6.2./bin/mg5\_aMCimport model Phi2\_simp\_tt\_qedgenerate p p \> y0 \[QCD\] QED \= 0 @0 |
-| :---- |
+**Here, the process can diverge depending on MG5 versions. In older version we could add processes without NLO/LO issues, but newer versions of MG5 take issue with mixing NLO/LO so we must use \[noborn=QCD\].**
+```csh
+add process p p > y0 j [noborn=QCD] QED = 0 @1
+add process p p > y0 j j [noborn=QCD] QED = 0 @2
+output XaaTEST_XYZ #name whatever you want 
+```
 
-### Here, the process can diverge depending on MG5 versions. In older version we could add processes without NLO/LO issues, but newer versions of MG5 take issue with mixing NLO/LO so we must use \[noborn=QCD\].
-
-| add process p p \> y0 j \[noborn=QCD\] QED \= 0 @1add process p p \> y0 j j \[noborn=QCD\] QED \= 0 @2output XaaTEST\_XYZ \#name whatever you want |
-| :---- |
-
-### This gets you most of what’s required to start converting MG output to a gridpack, we can prefill more into the cards by continuing through Stephen’s instructions. 
-
-| launchmadspin\=ON\<enter\>set mass 6 10000set mass 54 300 \#Set your X Massset mass 90000054 15 \#Set the phi masscompute\_widths 6 compute\_widths 54compute\_widths 90000054\<enter\>  |
-| :---- |
+**This gets you most of what’s required to start converting MG output to a gridpack, we can prefill more into the cards by continuing through Stephen’s instructions.** 
+```csh
+launch
+madspin=ON
+<enter>
+set mass 6 10000
+set mass 54 300 #Set your X Mass
+set mass 90000054 15 #Set the phi mass
+compute_widths 6
+compute_widths 54
+compute_widths 90000054
+<enter>
+```
 
 ### Along the way we are given a chance to edit the cards before we get our processes as output. We start by following Stephen’s instructions, but will later modify as required based off of gridpack requirements to compile and referring to the Card references the original configuration refers to. 
 
