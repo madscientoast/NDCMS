@@ -145,17 +145,23 @@ Stephen says continue as:
 *Then:*   
 *(in run\_card.dat)*
 
-* **Number of Events (Set near top of file, line 31 if no inserts)**  
-  100000 \= nevents \! Number of unweighted events requested  
+* **Number of Events (Set near top of file, line 31 if no inserts)**
+  ```csh
+  100000 \= nevents \! Number of unweighted events requested
+  ```  
 * **PDFS (PDF Choice block, line 44 if no inserts)**  
+  ```csh
   nn23lo1    \= pdlabel     \! PDF set  
   230000    \= lhaid     \! if pdlabel=lhapdf, this is the lhapdf number
+  ```
 
   becomes:
 
+  ```csh
   lhapdf	\= pdlabel \! PDF set  
-  306000	\= lhaid \! if pdlabel=lhapdf, this is the lhapdf number  
+  306000	\= lhaid \! if pdlabel=lhapdf, this is the lhapdf number```  
 * **Matching parameters (Matching parameter (MLM only), line 69 if no insterts)**  
+  ```csh
   1 \= ickkw            \! 0 no matching, 1 MLM  
   1.0 \= alpsfact         \! scale factor for QCD emission vx  
   False \= chcluster        \! cluster only according to channel diag  
@@ -163,9 +169,11 @@ Stephen says continue as:
   False  \= auto\_ptj\_mjj  \! Automatic setting of ptj and mjj if xqcut \>0  
   \! (turn off for VBF and single top processes)  
   30.0   \= xqcut   \! minimum kt jet measure between partons
+  ```
 
   becomes:
 
+  ```csh
   1	\= ickkw \! 0 no matching, 1 MLM  
   1     \= highestmult \! for ickkw=2, highest mult group  
   1     \= ktscheme \! for ickkw=1, 1 Durham kT, 2 Pythia pTE  
@@ -175,11 +183,11 @@ Stephen says continue as:
   5	\= asrwgtflavor \! highest quark flavor for a\_s reweight  
   True	\= auto\_ptj\_mjj \! Automatic setting of ptj and mjj if xqcut \>0  
                                      \! (turn off for VBF and single top processes)   
-  100.0	\= xqcut \! minimum kt jet measure between partons  
+  100.0	\= xqcut \! minimum kt jet measure between partons```  
 * **Minimum jet pT (mins and max block, line 115 after above changes)**  
+  ```csh
   20.0 → 0.0 for ptj value
-
-*(in param\_card.dat)*
+  ```
 
 We then can refer to the CMSSW reference for necessary adjustments as needed.   
 [https://github.com/cms-sw/genproductions/tree/mg27x/bin/MadGraph5\_aMCatNLO/cards/production/2017/13TeV/XtoAAto4G/XtoAAto4G\_X500A5](https://github.com/cms-sw/genproductions/tree/mg27x/bin/MadGraph5_aMCatNLO/cards/production/2017/13TeV/XtoAAto4G/XtoAAto4G_X500A5)
