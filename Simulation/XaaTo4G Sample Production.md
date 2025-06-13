@@ -308,10 +308,19 @@ args \= cms.vstring('/path/to/genproductions/bin/MadGraph5\_aMCatNLO/XaaTo4G\_X3
 
 [(https://github.com/madscientoast/NDCMS/blob/master/Simulation/XaaTo4G.py)](https://github.com/madscientoast/NDCMS/blob/master/Simulation/XaaTo4G.py)
 
-### From the same reference we will then run mostly the same cmsDriver command, but slightly modified so that it doesn’t spit errors at us. 
-
-| export SEED=$(($(date \+%s) % 100 \+ 1))cmsDriver.py Configuration/Generator/python/your\_fragment.py \--eventcontent RAWSIM,LHE \--customise Configuration/DataProcessing/Utils.addMonitoring \--datatier GEN-SIM,LHE \--conditions auto:phase1\_2018\_realistic\--beamspot Realistic25ns13TeVEarly2018Collision \--customise\_commands process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" \--step LHE,GEN,SIM \--geometry DB:Extended \--era Run2\_2018 \--python\_filename NPS-X300A20wmLHEGS\_1\_cfg.py \--fileout file:NPS-X300A20wmLHEGS\_1.root \--number 10 \--no\_exec \--mc |
-| :---- |
+** From the same reference we will then run mostly the same cmsDriver command, but slightly modified so that it doesn’t spit errors at us** 
+```csh
+export SEED=$(($(date +%s) % 100 + 1))
+cmsDriver.py Configuration/Generator/python/your_fragment.py \
+--eventcontent RAWSIM,LHE \
+--customise Configuration/DataProcessing/Utils.addMonitoring \
+--datatier GEN-SIM,LHE --conditions auto:phase1_2018_realistic \
+--beamspot Realistic25ns13TeVEarly2018Collision \
+--customise_commands process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" \
+--step LHE,GEN,SIM --geometry DB:Extended --era Run2_2018 \
+--python_filename NPS-X300A20wmLHEGS_1_cfg.py --fileout file:NPS-X300A20wmLHEGS_1.root \
+--number 10 \--no\_exec \--mc
+```
 
 ### 
 
