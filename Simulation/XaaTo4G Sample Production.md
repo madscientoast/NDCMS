@@ -151,7 +151,7 @@ Stephen says continue as:
   nn23lo1    \= pdlabel     \! PDF set  
   230000    \= lhaid     \! if pdlabel=lhapdf, this is the lhapdf number
 
-  		**becomes:**
+  		becomes:
 
   lhapdf	\= pdlabel \! PDF set  
   306000	\= lhaid \! if pdlabel=lhapdf, this is the lhapdf number  
@@ -164,7 +164,7 @@ Stephen says continue as:
   \! (turn off for VBF and single top processes)  
   30.0   \= xqcut   \! minimum kt jet measure between partons
 
-  		**becomes:**
+  		becomes:
 
   1	\= ickkw \! 0 no matching, 1 MLM  
   1     \= highestmult \! for ickkw=2, highest mult group  
