@@ -85,7 +85,7 @@ make check
 make install
 ```
 Then change:
-MG5_aMC_v2_6_2/input/mg5_configuration.txt:	
+MG5_aMC_v2_6_2/input/mg5_configuration.txt\:	
 \# fastjet = fastjet-config (default, change this to next line:)	
 fastjet =  /path/to/MG5_aMC_v3_6_2/HEPTools/fastjet (change it to this!)
 
