@@ -319,7 +319,7 @@ cmsDriver.py Configuration/Generator/python/your_fragment.py \
 --customise_commands process.RandomNumberGeneratorService.externalLHEProducer.initialSeed="int(${SEED})" \
 --step LHE,GEN,SIM --geometry DB:Extended --era Run2_2018 \
 --python_filename NPS-X300A20wmLHEGS_1_cfg.py --fileout file:NPS-X300A20wmLHEGS_1.root \
---number 10 \--no\_exec \--mc
+--number 10 --no_exec --mc
 ```
 
 ### 
