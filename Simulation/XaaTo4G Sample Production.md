@@ -147,43 +147,43 @@ Stephen says continue as:
 
 * **Number of Events (Set near top of file, line 31 if no inserts)**
   ```csh
-  100000 \= nevents \! Number of unweighted events requested
+  100000 = nevents ! Number of unweighted events requested
   ```  
 * **PDFS (PDF Choice block, line 44 if no inserts)**  
   ```csh
-  nn23lo1    \= pdlabel     \! PDF set  
-  230000    \= lhaid     \! if pdlabel=lhapdf, this is the lhapdf number
+  nn23lo1    = pdlabel     ! PDF set  
+  230000    = lhaid     ! if pdlabel=lhapdf, this is the lhapdf number
   ```
 
   becomes:
 
   ```csh
-  lhapdf	\= pdlabel \! PDF set  
-  306000	\= lhaid \! if pdlabel=lhapdf, this is the lhapdf number```  
+  lhapdf	= pdlabel ! PDF set  
+  306000	= lhaid ! if pdlabel=lhapdf, this is the lhapdf number```  
 * **Matching parameters (Matching parameter (MLM only), line 69 if no insterts)**  
   ```csh
-  1 \= ickkw            \! 0 no matching, 1 MLM  
-  1.0 \= alpsfact         \! scale factor for QCD emission vx  
-  False \= chcluster        \! cluster only according to channel diag  
-  5 \= asrwgtflavor     \! highest quark flavor for a\_s reweight  
-  False  \= auto\_ptj\_mjj  \! Automatic setting of ptj and mjj if xqcut \>0  
-  \! (turn off for VBF and single top processes)  
-  30.0   \= xqcut   \! minimum kt jet measure between partons
+  1 = ickkw            ! 0 no matching, 1 MLM  
+  1.0 = alpsfact         ! scale factor for QCD emission vx  
+  False = chcluster        ! cluster only according to channel diag  
+  5 = asrwgtflavor     ! highest quark flavor for a_s reweight  
+  False  = auto_ptj_mjj  ! Automatic setting of ptj and mjj if xqcut >0  
+  ! (turn off for VBF and single top processes)  
+  30.0   = xqcut   ! minimum kt jet measure between partons
   ```
 
   becomes:
 
   ```csh
-  1	\= ickkw \! 0 no matching, 1 MLM  
-  1     \= highestmult \! for ickkw=2, highest mult group  
-  1     \= ktscheme \! for ickkw=1, 1 Durham kT, 2 Pythia pTE  
-  1.0	\= alpsfact \! scale factor for QCD emission vx  
-  False	\= chcluster \! cluster only according to channel diag  
-  False \= pdfwgt \! for ickkw=1, perform pdf reweighting  
-  5	\= asrwgtflavor \! highest quark flavor for a\_s reweight  
-  True	\= auto\_ptj\_mjj \! Automatic setting of ptj and mjj if xqcut \>0  
-                                     \! (turn off for VBF and single top processes)   
-  100.0	\= xqcut \! minimum kt jet measure between partons```  
+  1	= ickkw \! 0 no matching, 1 MLM  
+  1     = highestmult ! for ickkw=2, highest mult group  
+  1     = ktscheme ! for ickkw=1, 1 Durham kT, 2 Pythia pTE  
+  1.0	= alpsfact ! scale factor for QCD emission vx  
+  False	= chcluster ! cluster only according to channel diag  
+  False = pdfwgt ! for ickkw=1, perform pdf reweighting  
+  5	= asrwgtflavor ! highest quark flavor for a_s reweight  
+  True	= auto_ptj_mjj ! Automatic setting of ptj and mjj if xqcut >0  
+                                     ! (turn off for VBF and single top processes)   
+  100.0	= xqcut ! minimum kt jet measure between partons```  
 * **Minimum jet pT (mins and max block, line 115 after above changes)**  
   ```csh
   20.0 → 0.0 for ptj value
@@ -198,15 +198,41 @@ More on editing these cards in the next section though.
 
 Now that we’ve run MadGraph, we need to take our Cards and produce a gridpack. 
 
-### The first thing to do is to copy your MG project cards to your gridpack generation path in genproductions (the gridpack script is finicky about the path). We will also need to rename the primary cards with our project name as a prefix. Here’s an example of how to do this:
+### The first thing to do is to copy your MG project cards to your gridpack generation path in genproductions (the gridpack script is finicky about the path). We will also need to rename the primary cards with our project name as a prefix. 
 
-| cp \-r  /path/to/XaaTo4G\_X300A20/Cards /path/to/genproductions/bin/MadGraph5\_aMCatNLOcd /path/to/genproductions/bin/MadGraph5\_aMCatNLO/Cardsmv proc\_card\_mg5.dat XaaTo4G\_X300A20\_proc\_card.datmv run\_card.dat XaaTo4G\_X300A20\_run\_card.datmv param\_card.dat XaaTo4G\_X300A20\_param\_card.datmv madspin\_card.dat XaaTo4G\_X300A20\_madspin\_card.dat |
-| :---- |
+**Here’s an example of how to do this:**
+```csh
+cp -r  /path/to/XaaTo4G_X300A20/Cards /path/to/genproductions/bin/MadGraph5_aMCatNLO
+cd /path/to/genproductions/bin/MadGraph5_aMCatNLO/Cards
+mv proc_card_mg5.dat XaaTo4G_X300A20_proc_card.dat
+mv run_card.dat XaaTo4G_X300A20_run_card.dat
+mv param_card.dat XaaTo4G_X300A20_param_card.dat
+mv madspin_card.dat XaaTo4G_X300A20_madspin_card.dat
+```
 
 ### Next, we will make a customize card that enters parameters for the gridpack. We use Stephen’s old setup as a guide ([https://github.com/cms-sw/genproductions/tree/mg27x/bin/MadGraph5\_aMCatNLO/cards/production/2017/13TeV/XtoAAto4G/XtoAAto4G\_X500A5](https://github.com/cms-sw/genproductions/tree/mg27x/bin/MadGraph5_aMCatNLO/cards/production/2017/13TeV/XtoAAto4G/XtoAAto4G_X500A5)). The only differences here are that we choose our X, a masses and may have different decay widths. Refer to your proc\_card output for your decay widths (i.e. for PIDs 6, 54, and 90000054). PID 6 should always have the same mass and decay width. DM parameters stay the same as well.
 
-| nano XaaTo4G\_X300A20\_customizecards.datset param\_card *mass 54 3.000000e+02*set *param\_card decay 54 1.314449e-02*set *param\_card mass 90000054 2.000000e+01*set *param\_card decay 90000054 1.970744e+00*set *param\_card mass 6 1.000000e+04*set *param\_card decay 6 3.281569e+05*set *param\_card dminputs 1.000000e+00* set *param\_card dminputs 2 0.000000e+00*set *param\_card dminputs 3 1.000000e+00*set *param\_card dminputs 4 0.000000e+00*set *param\_card dminputs 5 1.000000e+00*set *param\_card dminputs 6 1.000000e+00*set *param\_card dminputs 7 0.000000e+00*set *param\_card dminputs 8 0.000000e+00*set *param\_card dminputs 9 1.000000e+01*set *param\_card dminputs 10 1.000000e+04*set *param\_card dminputs 11 1.000000e+00*set *param\_card dminputs 12 0.000000e+00* |
-| :---- |
+```csh
+nano XaaTo4G_X300A20_customizecards.dat
+set param_card mass 54 3.000000e+02
+set param_card decay 54 1.314449e-02
+set param_card mass 90000054 2.000000e+01
+set param_card decay 90000054 1.970744e+00
+set param_card mass 6 1.000000e+04
+set param_card decay 6 3.281569e+05
+set param_card dminputs 1.000000e+00
+set param_card dminputs 2 0.000000e+00
+set param_card dminputs 3 1.000000e+00
+set param_card dminputs 4 0.000000e+00
+set param_card dminputs 5 1.000000e+00
+set param_card dminputs 6 1.000000e+00
+set param_card dminputs 7 0.000000e+00
+set param_card dminputs 8 0.000000e+00
+set param_card dminputs 9 1.000000e+01
+set param_card dminputs 10 1.000000e+04
+set param_card dminputs 11 1.000000e+00
+set param_card dminputs 12 0.000000e+00
+```
 
 Exit out and save. 
 
@@ -245,8 +271,10 @@ We will also have to make a slight edit to the CMSSW version that is packaged wi
 
 Seek out the section that defines CMSSW\_VERSION.
 
-* if \[\[ $SYSTEM\_RELEASE \== \*"release 7"\* \]\]; then   
-*         cmssw\_version=CMSSW\_12\_4\_8
+```python
+if \[\[ $SYSTEM\_RELEASE \== \*"release 7"\* \]\]; then
+    cmssw\_version=CMSSW\_12\_4\_8
+```
 
 Change the second line to the following.
 
