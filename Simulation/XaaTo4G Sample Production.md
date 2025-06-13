@@ -308,7 +308,7 @@ args \= cms.vstring('/path/to/genproductions/bin/MadGraph5\_aMCatNLO/XaaTo4G\_X3
 
 [(https://github.com/madscientoast/NDCMS/blob/master/Simulation/XaaTo4G.py)](https://github.com/madscientoast/NDCMS/blob/master/Simulation/XaaTo4G.py)
 
-** From the same reference we will then run mostly the same cmsDriver command, but slightly modified so that it doesn’t spit errors at us ** 
+**From the same reference we will then run mostly the same cmsDriver command, but slightly modified so that it doesn’t spit errors at us ** 
 ```csh
 export SEED=$(($(date +%s) % 100 + 1))
 cmsDriver.py Configuration/Generator/python/your_fragment.py \
