@@ -700,4 +700,90 @@ To ensure ease of use, we will use CMMSW_13_2_9. This is because the Run3 PU ava
 * The secondary Era tag is all that changes here, just follow the NanoAOD reference.  
   * –era Run3,run3\_nanoAOD\_124
 
-## That basically covers all of the changes required to produce for Run3.
+# NPS Production Instructions
+This is what we actually do. This section assumes you already have all MG cards you’ll need for producing gridpacks and eventually ROOT files. 
+
+## NPS Run2 UL Production
+For Run2 UL generation we start by logging in to lxplus normally (i.e. ssh user@lxplus.cern.ch). You will then set up the UL genproductions environment.
+
+```csh 
+git clone https://gitlab.cern.ch/cms-gen/genproductions_scripts.git
+cd genproductions_scripts
+git checkout mg265
+cmssw-el7
+```
+
+Once you have genproductions set up, drop your MG cards into the ‘genproductions_scripts/bin/MadGraph5_aMCatNLO/’ folder.
+
+One may want to do a slight edit to runcms_LO.sh and runcms_NLO.sh to ensure your pdfs are loaded correctly.
+
+The fix is basically as follows.
+
+```csh
+#pdfsets="PDF_SETS_REPLACE"
+pdfsets="306000@0"
+```
+
+To generate gridpacks move into the above directory and use gridpack_generation.sh as follows. 
+
+```csh
+./gridpack_generation.sh NAME CARDDIR RUNHOME
+```
+
+RUNHOME is optional, so if you omit it it will be done in the base directory. 
+I normally do, 
+
+```csh
+./gridpack_generation.sh X200A10 XaaTo4G_Cards/Run3/X200A10
+```
+
+
+To check these are running correctly, you’ll need to untar them and try generating an LHE file. Try this. 
+
+```csh
+tar -xvf gridpackfile.tar.xz
+cd gridpackfile_directory 
+./runcmsgrid.sh 10 1234 1
+```
+
+The PAG should do the rest of the cmsDriver steps for you from here. 
+
+## NPS Run3 Production
+For Run3 generation we start by logging in to lxplus for EL8 (i.e. ssh user@lxplus8.cern.ch). You will then set up the genproductions environment.
+
+```csh
+git clone https://gitlab.cern.ch/cms-gen/genproductions_scripts.git
+cd genproductions_scripts
+```
+ 
+Once you have genproductions set up, drop your MG cards into the ‘genproductions_scripts/bin/MadGraph5_aMCatNLO/’ folder.
+
+To generate gridpacks move into the above directory and use gridpack_generation.sh as follows. 
+
+```csh
+./gridpack_generation.sh NAME CARDDIR RUNHOME
+```
+
+RUNHOME is optional, so if you omit it it will be done in the base directory. 
+I normally do, 
+
+```csh
+./gridpack_generation.sh X200A10 XaaTo4G_Cards/Run3/X200A10
+```
+
+To check these are running correctly, you’ll need to untar them and try generating an LHE file. Try this. 
+
+```csh
+tar -xvf gridpackfile.tar.xz
+cd gridpackfile_directory 
+./runcmsgrid.sh 10 1234 1
+```
+
+The PAG should do the rest of the cmsDriver steps for you from here. 
+
+You will likely need to clean up the generation directory as the home directory space on lxplus is limited. Doing the following should be enough. 
+```csh
+rm -rf X200A10
+rm X200A10.log
+mv gridpackname.tar.gz /eos/user/initial/name/wherever
+```
