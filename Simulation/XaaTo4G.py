@@ -2,7 +2,7 @@
 import FWCore.ParameterSet.Config as cms
 
 externalLHEProducer = cms.EDProducer("ExternalLHEProducer",
-    args = cms.vstring('/eos/user/r/rsnuggsj/Gridpacks/X200A10_el9_amd64_gcc11_CMSSW_13_2_9_tarball.tar.xz'),
+    args = cms.vstring('/cvmfs/cms-griddata.cern.ch/phys_generator/gridpacks_tarball/pp/13TeV/madgraph/XaaTo4G/X200A10_slc7_amd64_gcc700_CMSSW_10_6_19_tarball.tar.xz'),
     nEvents = cms.untracked.uint32(10),
     numberOfParameters = cms.uint32(1),
     outputFile = cms.string('cmsgrid_final.lhe'),
