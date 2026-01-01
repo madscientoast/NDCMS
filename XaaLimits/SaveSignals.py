@@ -19,7 +19,7 @@ fileset = {
         "metadata": {
             "is_mc": True
         }
-    }'''
+    }
 }
 
 # Define What to actually do here #
