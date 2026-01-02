@@ -35,7 +35,7 @@ class MyProcessor(processor.ProcessorABC):
         trigger = events.HLT.TriplePhoton_35_35_5_CaloIdLV2_R9IdVL # Run 2 2017-2018 trigger
 
         all_photons = events.Photon[(ak.num(events.Photon) >= 4) & trigger]
-        all_photons = all_photons[(all_photons.pt[:,1] >= 22.0)] # Applying a pt cut on the second photon to match the trigger to the updated one in the MC #
+        #all_photons = all_photons[(all_photons.pt[:,1] >= 22.0)] # Applying a pt cut on the second photon to match the trigger to the updated one in the MC #
         
       # Check if photon is in barrel or endcap #
         isEB = abs(all_photons.eta) < 1.48
