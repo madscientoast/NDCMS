@@ -35,6 +35,7 @@ class MyProcessor(processor.ProcessorABC):
         trigger = events.HLT.TriplePhoton_35_35_5_CaloIdLV2_R9IdVL # Run 2 2017-2018 trigger
 
         all_photons = events.Photon[(ak.num(events.Photon) >= 4) & trigger]
+        all_photons = all_photons[(all_photons.pt[:,1] >= 22.0)] # Applying a pt cut on the second photon to match the trigger to the updated one in the MC #
         
       # Check if photon is in barrel or endcap #
         isEB = abs(all_photons.eta) < 1.48
@@ -53,8 +54,6 @@ class MyProcessor(processor.ProcessorABC):
         MVA_cut4 = ((isEB & (all_photons.mvaID[:,3] >= 0.27)) |      # barrel threshold
                 (isEE & (all_photons.mvaID[:,3] >= 0.14)))       # endcap threshold
 
-        # Applying a pt cut on the second photon to match the trigger to the updated one in the MC #
-        #MVA_cut =  (all_photons.pt[:,1] >= 22.0) & (MVA_cut1)# & (MVA_cut2) & # & (MVA_cut3) # only applies for the older 2017 runs
         MVA_cut =  (MVA_cut1)# & (MVA_cut2) & # & (MVA_cut3)
         invert_MVA = ~MVA_cut # for CR
         photons_wMVA = all_photons[MVA_cut] # apply MVA
