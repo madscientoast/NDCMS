@@ -1,22 +1,26 @@
 
-from coffea.nanoevents import NanoEventsFactory, NanoAODSchema
+from coffea.nanoevents import NanoAODSchema
 from coffea import processor
 import uproot as up
 import awkward as ak
 import numpy as np
 from Pairing import PairDeltaR, PairMA, unique_pairing_perms
+import correctionlib
+import sys
+import json
 NanoAODSchema.warn_missing_crossrefs=False
 
-fileset = {
-    "Background": {
-        "files": {
-            # files here #
-        },
-        "metadata": {
-            "is_mc": False
-        }
-    }
-}    
+signal_region = str(sys.argv[1])
+
+# Load in files #
+with open("/path/to/EGamma_2018_Dataset.json") as f:
+    fileset = json.load(f)
+
+# Load in json for Scale Factors
+cset_mva = correctionlib.CorrectionSet.from_file("/path/to/photon.json.gz")
+phoID = cset_mva["UL-Photon-ID-SF"]
+cset_pu = correctionlib.CorrectionSet.from_file("/path/to/puWeights.json.gz")
+pileup = cset_pu["Collisions18_UltraLegacy_goldenJSON"]
 
 # Define What to actually do here #
 class MyProcessor(processor.ProcessorABC):
@@ -32,33 +36,26 @@ class MyProcessor(processor.ProcessorABC):
         dataset = events.metadata['dataset']
         trigger = events.HLT.TriplePhoton_35_35_5_CaloIdLV2_R9IdVL # Run 2 2017-2018 trigger
         all_photons = events.Photon[(ak.num(events.Photon) >= 4) & trigger]
-        
-      # Check if photon is in barrel or endcap #
-        isEB = abs(all_photons.eta) < 1.48
-        isEE = abs(all_photons.eta) >= 1.48
-        
-        # Define MVA_cut for each photon #
-        MVA_cut1 = ((isEB & (all_photons.mvaID[:,0] >= 0.27)) |      # barrel threshold
-                (isEE & (all_photons.mvaID[:,0] >= 0.14)))       # endcap threshold
+        piles = events.Pileup[(ak.num(events.Photon) >= 4) & trigger]
 
-        MVA_cut2 = ((isEB & (all_photons.mvaID[:,1] >= 0.27)) |      # barrel threshold
-                (isEE & (all_photons.mvaID[:,1] >= 0.14)))       # endcap threshold
-        
-        MVA_cut3 = ((isEB & (all_photons.mvaID[:,2] >= 0.27)) |      # barrel threshold
-                (isEE & (all_photons.mvaID[:,2] >= 0.14)))       # endcap threshold
-
-        MVA_cut4 = ((isEB & (all_photons.mvaID[:,3] >= 0.27)) |      # barrel threshold
-                (isEE & (all_photons.mvaID[:,3] >= 0.14)))       # endcap threshold
-
-        MVA_cut =  (MVA_cut1)# & (MVA_cut2) & # & (MVA_cut3)
-        invert_MVA = ~MVA_cut # for CR
+        # Apply MVAID #
+        MVA_cut = (all_photons.mvaID_WP90) & (all_photons.electronVeto)
         photons_wMVA = all_photons[MVA_cut] # apply MVA
+        sr_mask = ak.num(photons_wMVA) >= 4
 
         # Filter any events that have too few photons after MVA cut #
-        photons_presel = photons_wMVA[ak.num(photons_wMVA) >= 4]
+        piles_presel = piles[sr_mask]
+        photons_presel = photons_wMVA[sr_mask]
 
         # Now take the 4 leading photons from every event #
         photons = photons_presel[:,:4]
+
+        # Process some Scale Factors #
+        pu_nom = pileup.evaluate(piles_presel.nTrueInt,"nominal")
+        pt_eval = ak.where(photons.pt >= 500, 499.0, ak.where(photons.pt < 20, 20.0, photons.pt))
+        phoSF_i = phoID.evaluate("2018", "sf", "wp90", photons.eta, pt_eval)
+        phoSF = ak.where(photons.pt < 20,1.0,phoSF_i)
+        initial_event_weight = phoSF[:,0]*phoSF[:,1]*phoSF[:,2]*phoSF[:,3]*pu_nom
 
         # Now to pick best combo
         combos = np.array(unique_pairing_perms(4))
@@ -92,26 +89,37 @@ class MyProcessor(processor.ProcessorABC):
         X = Phi0 + Phi1
         
         PhiM = (Phi0.mass + Phi1.mass)/2
-        alpha = PhiM/X.mass
         DR1 = photons[:,0].deltaR(photons[:,1])
         DR2 = photons[:,2].deltaR(photons[:,3])
         mass_asym = abs(Phi0.mass - Phi1.mass)/(Phi0.mass + Phi1.mass)
         DeltaEta = abs(Phi0.eta - Phi1.eta)
+
+        # Evaluate RPT #
+        photons_sorted = photons[ak.argsort(photons.pt, axis=1, ascending=False)]
+        photons_lead3 = photons_sorted[:, :3]
+        photon4 = photons_sorted[:, 3]
+        pt4 = photon4.pt
+        avg_pt123 = ak.mean(photons_lead3.pt, axis=1)
+        RPT = pt4/avg_pt123
+        RPT_sel = (RPT >= 0.14)
         
-        # Region A Cuts #
-        X = X[(DR1 < 1.0) & (mass_asym < 0.1)]
-        
-        # Region B filter #
-        DRcuts = (DR1 < 2.75) & (DR2 < 2.75)
-        #X = X[(DR1 >= 1.0) & DRcuts & (mass_asym < 0.1) & (DeltaEta < 1.9)] #full cut
-        #X = X[(DR1 >= 1.0)]# & (mass_asym < 0.1)] # relaxed cut
-      
+        # Region Filters #
+        srA = (DR1 < 1.0) & (mass_asym < 0.1) & RPT_sel
+        srB = (DR1 >= 1.0) & (mass_asym < 0.1) & (DR1 < 2.75) & (DR2 < 2.75) & RPT_sel
+
+        if signal_region == "A":
+            X = X[srA]
+            event_weights = initial_event_weight[srA]
+        else:
+            X = X[srB]
+            event_weights = initial_event_weight[srB]
         Xm = X.mass
 
         return {
             dataset: {
                 "entries": len(events),
-                "Xm" : Xm.tolist()
+                "Xm" : Xm.tolist(),
+                "weights" : event_weights.tolist()
             }
         }
     
@@ -135,17 +143,11 @@ out, metrics = iterative_run(
     processor_instance=MyProcessor("virtual"),
 )
 
-# Load events #
-num_events = out["Background"]["entries"]
-print("Number of events: ", num_events)
-
 Xs = out["Background"]["Xm"]
-print("Num of events after selections: ",len(Xs))
-
-weights = np.ones_like(Xs)
+weights = out["Background"]["weights"]
 
 # Make ROOT plots
-with up.recreate("bkgA_2018.root") as fout:
+with up.recreate("bkg"+signal_region+"_2018.root") as fout:
     # Create a TTree named "events" with one branch "mass"
     fout["data_obs"] = {"mass": Xs,
                         "weights": weights}
