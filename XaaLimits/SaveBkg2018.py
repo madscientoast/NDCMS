@@ -16,12 +16,6 @@ signal_region = str(sys.argv[1])
 with open("/path/to/EGamma_2018_Dataset.json") as f:
     fileset = json.load(f)
 
-# Load in json for Scale Factors
-cset_mva = correctionlib.CorrectionSet.from_file("/path/to/photon.json.gz")
-phoID = cset_mva["UL-Photon-ID-SF"]
-cset_pu = correctionlib.CorrectionSet.from_file("/path/to/puWeights.json.gz")
-pileup = cset_pu["Collisions18_UltraLegacy_goldenJSON"]
-
 # Define What to actually do here #
 class MyProcessor(processor.ProcessorABC):
     def __init__(self, mode="virtual"):
@@ -36,7 +30,6 @@ class MyProcessor(processor.ProcessorABC):
         dataset = events.metadata['dataset']
         trigger = events.HLT.TriplePhoton_35_35_5_CaloIdLV2_R9IdVL # Run 2 2017-2018 trigger
         all_photons = events.Photon[(ak.num(events.Photon) >= 4) & trigger]
-        piles = events.Pileup[(ak.num(events.Photon) >= 4) & trigger]
 
         # Apply MVAID #
         MVA_cut = (all_photons.mvaID_WP90) & (all_photons.electronVeto)
@@ -44,18 +37,10 @@ class MyProcessor(processor.ProcessorABC):
         sr_mask = ak.num(photons_wMVA) >= 4
 
         # Filter any events that have too few photons after MVA cut #
-        piles_presel = piles[sr_mask]
         photons_presel = photons_wMVA[sr_mask]
 
         # Now take the 4 leading photons from every event #
         photons = photons_presel[:,:4]
-
-        # Process some Scale Factors #
-        pu_nom = pileup.evaluate(piles_presel.nTrueInt,"nominal")
-        pt_eval = ak.where(photons.pt >= 500, 499.0, ak.where(photons.pt < 20, 20.0, photons.pt))
-        phoSF_i = phoID.evaluate("2018", "sf", "wp90", photons.eta, pt_eval)
-        phoSF = ak.where(photons.pt < 20,1.0,phoSF_i)
-        initial_event_weight = phoSF[:,0]*phoSF[:,1]*phoSF[:,2]*phoSF[:,3]*pu_nom
 
         # Now to pick best combo
         combos = np.array(unique_pairing_perms(4))
@@ -109,18 +94,14 @@ class MyProcessor(processor.ProcessorABC):
 
         if signal_region == "A":
             X = X[srA]
-            event_weights = initial_event_weight[srA]
         else:
             X = X[srB]
-            event_weights = initial_event_weight[srB]
         Xm = X.mass
 
         return {
             dataset: {
                 "entries": len(events),
-                "Xm" : Xm.tolist(),
-                "weights" : event_weights.tolist()
-            }
+                "Xm" : Xm.tolist()            }
         }
     
     def postprocess(self, accumulator):
@@ -144,7 +125,7 @@ out, metrics = iterative_run(
 )
 
 Xs = out["Background"]["Xm"]
-weights = out["Background"]["weights"]
+weights = np.ones_like(Xs)
 
 # Make ROOT plots
 with up.recreate("bkg"+signal_region+"_2018.root") as fout:
