@@ -101,7 +101,8 @@ class MyProcessor(processor.ProcessorABC):
         return {
             dataset: {
                 "entries": len(events),
-                "Xm" : Xm.tolist()            }
+                "Xm" : Xm.tolist()            
+            }
         }
     
     def postprocess(self, accumulator):
